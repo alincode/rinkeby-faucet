@@ -1,0 +1,27 @@
+{
+  "name": "web3js_event_sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "budo src/app.js:bundle.js --live --open",
+    "build": "browserify src/app.js > bundle.js.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alincode/web3js_event_sandbox.git"
+  },
+  "keywords": [],
+  "author": "alincode <alincode@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alincode/web3js_event_sandbox/issues"
+  },
+  "homepage": "https://github.com/alincode/web3js_event_sandbox#readme",
+  "dependencies": {
+    "csjs-inject": "^1.0.1",
+    "morphdom": "^2.3.3",
+    "nanohtml": "^1.2.6",
+    "web3": "^1.0.0-beta.36"
+  }
+}

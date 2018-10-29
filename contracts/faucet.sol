@@ -91,7 +91,11 @@ contract Faucet {
     }
     
     // 查詢餘額
-    function getBalance() public onlyOwner view returns (uint) {
+    function getBalance() public view returns (uint) {
         return this.balance;
+    }
+    
+    function remove() onlyOwner public {
+        selfdestruct(owner);
     }
 }
