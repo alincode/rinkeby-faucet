@@ -1,3 +1,3 @@
-# Web3.js event sandbox
+# Rinkeby Faucet
 
 

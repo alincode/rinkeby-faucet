@@ -1,5 +1,5 @@
 {
-  "name": "web3js_event_sandbox",
+  "name": "rinkeby-faucet",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alincode/web3js_event_sandbox.git"
+    "url": "git+https://github.com/alincode/rinkeby-faucet.git"
   },
   "keywords": [],
   "author": "alincode <alincode@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/alincode/web3js_event_sandbox/issues"
+    "url": "https://github.com/alincode/rinkeby-faucet/issues"
   },
-  "homepage": "https://github.com/alincode/web3js_event_sandbox#readme",
+  "homepage": "https://github.com/alincode/rinkeby-faucet#readme",
   "dependencies": {
     "csjs-inject": "^1.0.1",
     "morphdom": "^2.3.3",

@@ -22,8 +22,8 @@ contract Faucet {
     mapping (address => User) public users;
     
     // 事件
-    event UserDonate(address indexed addr, User user);
-    event UserWithdrawal(address indexed addr, User user);
+    event UserDonate(address indexed addr, User user, uint balance);
+    event UserWithdrawal(address indexed addr, User user, uint balance);
     
     modifier onlyOwner() { require(msg.sender == owner); _; }
     
@@ -54,7 +54,7 @@ contract Faucet {
             users[msg.sender].donateAt = now;
             if(msg.value >= 10 ether) blacklist[msg.sender] = false;
         }
-        emit UserDonate(msg.sender, users[msg.sender]);
+        emit UserDonate(msg.sender, users[msg.sender], this.balance);
     }
     
     // 提領
@@ -67,7 +67,7 @@ contract Faucet {
             users[msg.sender].withdrawalAt = now;
         }
         msg.sender.transfer(withdrawalAmount);
-        emit UserWithdrawal(msg.sender, users[msg.sender]);
+        emit UserWithdrawal(msg.sender, users[msg.sender], this.balance);
     }
     
     // 加入至黑名單

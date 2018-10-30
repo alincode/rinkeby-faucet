@@ -3,16 +3,33 @@ const html = require('nanohtml');
 const csjs = require('csjs-inject');
 const morphdom = require('morphdom');
 
-if (typeof web3 !== 'undefined') {
-  web3 = new Web3(web3.currentProvider);
-} else {
-  alert('initial failed');
+async function web3Init() {
+  if (ethereum) {
+    // ATTENTION: In an effort to improve user privacy, MetaMask will stop exposing user accounts to dapps by default beginning November 2nd, 2018. Dapps should call provider.enable() in order to view and use accounts.Please see https://bit.ly/2QQHXvF for complete information and up-to-date example code.
+    web3 = new Web3(ethereum);
+    try {
+      await ethereum.enable();
+    } catch (error) {}
+  } else if (web3) {
+    web3 = new Web3(web3.currentProvider);
+  } else {
+    console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+  }
 }
 
+web3Init();
+
+// if (typeof web3 !== 'undefined') {
+//   web3 = new Web3(web3.currentProvider);
+// } else {
+//   alert('initial failed');
+// }
+
+const DONATE_AMOUNT_ETH = "1.5";
 const ABI = require('./abi.json');
-const DEFAULT_ADDRESS = '0x614acceb5e02950be0ff771a4729228e5fa99aaf';
+const DEFAULT_ADDRESS = '0xeadae604454f71c41253d26a41827ef3860de32f';
 const contractAddress = localStorage.constract || DEFAULT_ADDRESS;
-const myContract = new web3.eth.Contract(ABI, contractAddress);
+myContract = new web3.eth.Contract(ABI, contractAddress);
 
 const css = csjs `
   .box {
@@ -60,6 +77,12 @@ function getNetworkName(networkId) {
   else return "";
 }
 
+function updateBalanceElement(data) {
+  const ether = web3.utils.fromWei(data, "ether");
+  const newElement = html `<div class="${css.result}">${ether} Ether in the faucent service.</div>`
+  morphdom(resultElement, newElement);
+}
+
 // ===== listening smart contract event =====
 
 // Generate filter options
@@ -78,6 +101,7 @@ myContract.events.UserDonate(options, async (error, event) => {
     return
   }
   console.log('UserDonate: ', event.returnValues);
+  updateBalanceElement(event.returnValues.balance);
   return
 })
 
@@ -87,6 +111,7 @@ myContract.events.UserWithdrawal(options, async (error, event) => {
     return
   }
   console.log('UserWithdrawal: ', event.returnValues);
+  updateBalanceElement(event.returnValues.balance);
   return
 })
 
@@ -97,7 +122,7 @@ function donate(event) {
   console.log('account: ', account);
   myContract.methods.donate().send({
     from: account,
-    value: web3.utils.toWei("5", "ether")
+    value: web3.utils.toWei(DONATE_AMOUNT_ETH, "ether")
   }, (err, data) => {
     if (err) return console.error(err);
     console.log('>>> donate ok.');
@@ -139,18 +164,26 @@ function getAccounts(result) {
     const address = addresses[0];
     web3.eth.defaultAccount = address;
     result.account = address;
-    getBalance(result);
+    withdrawalAmount(result);
   });
 }
 
-function getBalance(result) {
+function withdrawalAmount(result) {
   console.log('>>> 3');
+  myContract.methods.withdrawalAmount().call((err, data) => {
+    if (err) return console.error(err);
+    const ether = web3.utils.fromWei(data, "ether");
+    result.withdrawalAmount = ether;
+    getBalance(result);
+  })
+}
+
+function getBalance(result) {
+  console.log('>>> 4');
   myContract.methods.getBalance().call((err, data) => {
     if (err) return console.error(err);
     if (data != "0") {
-      const ether = web3.utils.fromWei(data, "ether");
-      const newElement = html `<div class="${css.result}">${ether} Ether in the faucent service.</div>`
-      morphdom(resultElement, newElement);
+      updateBalanceElement(data);
     }
     render(result);
   })
@@ -161,10 +194,10 @@ function render(result) {
   document.body.appendChild(html `
   <div class=${css.box} id="app">
     <h2>This Ether faucet is running on the ${getNetworkName(result.networkId)} network.</h2>
-    <div>This faucet drips 0.5 Ether every 24 hours. you can apply withdrawal ether.</div>
+    <div>This faucet drips ${result.withdrawalAmount} Ether every 24 hours. you can apply withdrawal ether.</div>
     Your account is： ${result.account}<br>
-    <button class=${css.button} onclick=${withdrawal}>Withdrawal 0.5 Eth</button>
-    <button class=${css.button} onclick=${donate}>Donate 5 Eth</button>
+    <button class=${css.button} onclick=${withdrawal}>Withdrawal ${result.withdrawalAmount} Eth</button>
+    <button class=${css.button} onclick=${donate}>Donate ${DONATE_AMOUNT_ETH} Eth</button>
     ${resultElement}
     <a href="https://${getNetworkName(result.networkId)}.etherscan.io/address/${contractAddress}">etherscan</a>
   </div>
