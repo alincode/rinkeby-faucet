@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "budo src/app.js:bundle.js --live --open",
-    "build": "browserify src/app.js > bundle.js"
+    "build": "browserify src/app.js > app.js"
   },
   "repository": {
     "type": "git",
